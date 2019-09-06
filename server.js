@@ -5,9 +5,20 @@ var http = require('http'),
 
 /* Global variables */
 var listingData, server;
-
 var requestHandler = function(request, response) {
   var parsedUrl = url.parse(request.url);
+  if(parsedUrl.pathname == "/listings"){
+    response.writeHead(200,{"Content-Type":"application/json"});
+    //response.write("The list:\n");
+    response.write(listingData);
+    //response.write("-------------------------");
+    //response.write("\nEND LIST\n");
+  }
+  else {
+    response.writeHead(404,{"Content-Type":"text/plain"});
+    response.write("Bad gateway error");
+  }
+  response.end();
 
   /*
     Your request handler should send listingData in the JSON format as a response if a GET request 
@@ -26,7 +37,9 @@ var requestHandler = function(request, response) {
    */
 };
 
+
 fs.readFile('listings.json', 'utf8', function(err, data) {
+  
   /*
     This callback function should save the data in the listingData variable, 
     then start the server. 
@@ -38,14 +51,17 @@ fs.readFile('listings.json', 'utf8', function(err, data) {
    */
 
     //Check for errors
-  
-
+  if(err){
+    console.log("Read file error");
+  }
+  else{
    //Save the sate in the listingData variable already defined
-  
-
-  //Creates the server
-  
-  //Start the server
-
-
+    listingData = data;
+   //Creates the server
+   //Start the server
+    server = http.createServer(requestHandler);
+    server.listen(port,function(){
+      console.log("Server is listening on: http://localhost:"+port);
+    });
+  }
 });
